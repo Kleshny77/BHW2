@@ -37,7 +37,18 @@ public class AnalysisManager
             CharacterCount = characterCount,
             WordCloudImageLocation = wordCloudImageLocation
         };
-        await File.WriteAllBytesAsync(entity.Location, content);
+        try
+        {
+            Console.WriteLine($"Attempting to write file to: {entity.Location}");
+            await File.WriteAllBytesAsync(entity.Location, content);
+            Console.WriteLine($"Successfully wrote file to: {entity.Location}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error writing file {entity.Location}: {ex.Message}");
+            Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+            throw; // Rethrow to see the full exception in logs
+        }
         _db.Analyses.Add(entity);
         await _db.SaveChangesAsync();
         return new FileAnalysisResult
@@ -125,13 +136,13 @@ public class AnalysisManager
             height = 600,
             fontFamily = "Roboto",
             loadGoogleFonts = "Roboto",
-            fontScale = 15,
-            removeStopwords = false,
-            backgroundColor = "black",
-            minFontSize = 10,
-            maxFontSize = 50,
+            fontScale = 30,
+            removeStopwords = true,
+            backgroundColor = "white",
+            minFontSize = 5,
+            maxFontSize = 100,
             rotation = "random",
-            colors = new[] { "#FFFFFF" },
+            colors = new[] { "#FF0000" },
             cleanWords = false
         };
         Console.WriteLine($"DEBUG: Sending text to QuickChart.io: '{text}'");
