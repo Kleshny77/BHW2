@@ -14,6 +14,7 @@ public class FileStorageManager
         _db = db;
         _storagePath = config["StoragePath"] ?? "./files";
         Directory.CreateDirectory(_storagePath);
+        Console.WriteLine($"FileStorageManager initialized with StoragePath: {_storagePath}");
     }
     public async Task<FileMetadata> SaveFileAsync(Stream fileStream, string fileName)
     {
@@ -24,10 +25,11 @@ public class FileStorageManager
         var existing = await _db.Files.FirstOrDefaultAsync(f => f.Hash == hash);
         if (existing != null)
         {
-            return new FileMetadata { Id = existing.Id, Name = existing.Name, Hash = existing.Hash, Location = existing.Location };
+            return new FileMetadata { Id = existing.Id, Name = existing.Name, Hash = existing.Hash, Location = Path.Combine(_storagePath, existing.Id.ToString()) };
         }
         var id = Guid.NewGuid();
         var location = Path.Combine(_storagePath, id.ToString());
+        Console.WriteLine($"Saving file to: {location}");
         await File.WriteAllBytesAsync(location, bytes);
         var entity = new FileEntity { Id = id, Name = fileName, Hash = hash, Location = location };
         _db.Files.Add(entity);
@@ -38,13 +40,15 @@ public class FileStorageManager
     {
         var entity = await _db.Files.FindAsync(id);
         if (entity == null) return null;
-        return new FileMetadata { Id = entity.Id, Name = entity.Name, Hash = entity.Hash, Location = entity.Location };
+        return new FileMetadata { Id = entity.Id, Name = entity.Name, Hash = entity.Hash, Location = Path.Combine(_storagePath, entity.Id.ToString()) };
     }
     public async Task<byte[]?> GetFileContentAsync(Guid id)
     {
         var entity = await _db.Files.FindAsync(id);
         if (entity == null) return null;
-        if (!File.Exists(entity.Location)) return null;
-        return await File.ReadAllBytesAsync(entity.Location);
+        var actualLocation = Path.Combine(_storagePath, entity.Id.ToString());
+        Console.WriteLine($"Attempting to read file from: {actualLocation}. Original database location: {entity.Location}");
+        if (!File.Exists(actualLocation)) return null;
+        return await File.ReadAllBytesAsync(actualLocation);
     }
 } 

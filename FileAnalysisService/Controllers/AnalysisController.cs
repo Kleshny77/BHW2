@@ -16,6 +16,7 @@ public class AnalysisController : ControllerBase
     [HttpPost("analyze")]
     public async Task<IActionResult> Analyze([FromQuery] Guid id, [FromForm] FileUploadDto dto)
     {
+        Console.WriteLine($"Received analyze request for id: {id}");
         var file = dto.File;
         if (file == null || file.Length == 0) return BadRequest("File content is missing.");
         using var ms = new MemoryStream();

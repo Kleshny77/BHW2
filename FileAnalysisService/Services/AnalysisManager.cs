@@ -123,15 +123,18 @@ public class AnalysisManager
             format = "png",
             width = 600,
             height = 600,
+            fontFamily = "Roboto",
+            loadGoogleFonts = "Roboto",
             fontScale = 15,
-            removeStopwords = true,
-            backgroundColor = "white",
+            removeStopwords = false,
+            backgroundColor = "black",
             minFontSize = 10,
             maxFontSize = 50,
             rotation = "random",
-            colors = new[] { "#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd", "#8c564b", "#e377c2", "#7f7f7f", "#bcbd22", "#17becf" }
+            colors = new[] { "#FFFFFF" },
+            cleanWords = false
         };
-
+        Console.WriteLine($"DEBUG: Sending text to QuickChart.io: '{text}'");
         try 
         {
             var response = await client.PostAsJsonAsync(url, requestData);

@@ -58,6 +58,7 @@ app.MapGet("/weatherforecast", () =>
 .WithName("GetWeatherForecast")
 .WithOpenApi();
 
+builder.WebHost.UseUrls("http://+:80");
 app.Run();
 
 record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)

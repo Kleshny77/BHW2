@@ -12,8 +12,17 @@ public class FileAnalysisClient
     }
     public async Task<FileAnalysisResult?> AnalyzeFileAsync(Guid id, byte[] content)
     {
-        var response = await _client.PostAsJsonAsync($"/analysis/analyze?id={id}", content);
-        if (!response.IsSuccessStatusCode) return null;
+        using var multiPartContent = new MultipartFormDataContent();
+        multiPartContent.Add(new ByteArrayContent(content), "file", "file.bin");
+
+        var response = await _client.PostAsync($"/analysis/analyze?id={id}", multiPartContent);
+        if (!response.IsSuccessStatusCode) 
+        {
+            Console.WriteLine($"Error calling FileAnalysisService analyze: {response.StatusCode}");
+            var errorContent = await response.Content.ReadAsStringAsync();
+            Console.WriteLine($"FileAnalysisService analyze error content: {errorContent}");
+            return null;
+        }
         return await response.Content.ReadFromJsonAsync<FileAnalysisResult>();
     }
     public async Task<FileAnalysisResult?> GetAnalysisAsync(Guid id)
@@ -31,7 +40,7 @@ public class FileAnalysisClient
     public async Task<byte[]?> GetWordCloudImageFromContentAsync(Guid id, byte[] content)
     {
         using var multiPartContent = new MultipartFormDataContent();
-        multiPartContent.Add(new ByteArrayContent(content), "fileContent", "file.bin");
+        multiPartContent.Add(new ByteArrayContent(content), "File", "file.bin");
         var response = await _client.PostAsync($"/analysis/wordcloud?id={id}", multiPartContent);
         
         if (!response.IsSuccessStatusCode) 
