@@ -44,10 +44,10 @@ public class AnalysisController : ControllerBase
         using var ms = new MemoryStream();
         await file.CopyToAsync(ms);
         var contentBytes = ms.ToArray();
-        var image = await _manager.GetWordCloudImageFromContentAsync(id, contentBytes);
-        if (image == null) return BadRequest();
-        Console.WriteLine($"Sending word cloud image of size: {image.Length} bytes");
-        return File(image, "image/png");
+        var svg = await _manager.GetWordCloudSvgFromContentAsync(id, contentBytes);
+        if (svg == null) return BadRequest();
+        Console.WriteLine($"Sending word cloud SVG of size: {svg.Length} characters");
+        return Content(svg, "image/svg+xml");
     }
     [HttpPost("wordcloud/svg")]
     public async Task<IActionResult> WordCloudSvg([FromQuery] Guid id, [FromForm] FileUploadDto dto)

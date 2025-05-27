@@ -3,6 +3,7 @@ using FileAnalysisService.Models;
 using Microsoft.EntityFrameworkCore;
 using Common.Models;
 using System.Net.Http.Json;
+using Newtonsoft.Json;
 
 namespace FileAnalysisService.Services;
 
@@ -132,17 +133,16 @@ public class AnalysisManager
         {
             text = text,
             format = "png",
-            width = 600,
-            height = 600,
+            width = 800,
+            height = 800,
             fontFamily = "Roboto",
             loadGoogleFonts = "Roboto",
-            fontScale = 30,
-            removeStopwords = true,
+            fontScale = 50,
+            removeStopwords = false,
             backgroundColor = "white",
-            minFontSize = 5,
-            maxFontSize = 100,
-            rotation = "random",
-            colors = new[] { "#FF0000" },
+            minFontSize = 10,
+            maxFontSize = 150,
+            colors = new[] { "#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd", "#8c564b", "#e377c2", "#7f7f7f", "#bcbd22", "#17becf" },
             cleanWords = false
         };
         Console.WriteLine($"DEBUG: Sending text to QuickChart.io: '{text}'");
@@ -179,16 +179,18 @@ public class AnalysisManager
         {
             text = text,
             format = "svg",
-            width = 600,
-            height = 600,
-            fontScale = 15,
-            removeStopwords = true,
+            width = 800,
+            height = 800,
+            fontFamily = "Noto Sans",
+            loadGoogleFonts = "Noto Sans",
+            fontScale = 50,
+            removeStopwords = false,
             backgroundColor = "white",
             minFontSize = 10,
-            maxFontSize = 50,
-            rotation = "random",
+            maxFontSize = 150,
             colors = new[] { "#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd", "#8c564b", "#e377c2", "#7f7f7f", "#bcbd22", "#17becf" }
         };
+        Console.WriteLine($"DEBUG: Sending requestData to QuickChart.io: {JsonConvert.SerializeObject(requestData)}");
         try
         {
             var response = await client.PostAsJsonAsync(url, requestData);
