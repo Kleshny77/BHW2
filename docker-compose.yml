@@ -1,0 +1,51 @@
+version: '3.8'
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+  filestorageservice:
+    build:
+      context: .
+      dockerfile: FileStorageService/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    depends_on:
+      - postgres
+    ports:
+      - "8081:80"
+    volumes:
+      - ./FileStorageService/files:/app/files
+    restart: always
+  fileanalysisservice:
+    build:
+      context: .
+      dockerfile: FileAnalysisService/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    depends_on:
+      - postgres
+    ports:
+      - "8082:80"
+    volumes:
+      - ./FileAnalysisService/analysis:/app/analysis
+    restart: always
+  apigateway:
+    build:
+      context: .
+      dockerfile: ApiGateway/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    depends_on:
+      - filestorageservice
+      - fileanalysisservice
+    ports:
+      - "8080:80"
+    restart: always
+volumes:
+  pgdata:
